@@ -1,0 +1,28 @@
+{
+  "name": "@livingdocs/release-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Marc Bachmann <marc.brookman@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@livingdocs/release-tools": "github:upfrontIO/release-tools",
+    "cached-callback": "^2.1.1",
+    "execa": "^0.7.0",
+    "fastify": "^0.24.0",
+    "flumecodec": "0.0.0",
+    "flumelog-offset": "^3.0.3",
+    "last-one-wins": "^1.0.4",
+    "lodash": "^4.17.4",
+    "rc": "^1.2.1",
+    "uuid": "^3.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/upfrontIO/release-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/upfrontIO/release-server/issues"
+  },
+  "homepage": "https://github.com/upfrontIO/release-server#readme",
+  "description": ""
+}
