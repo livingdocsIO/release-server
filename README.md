@@ -10,7 +10,7 @@ With the release-server you are able to apply a deployment on rancher with a sim
 In this example we configure two services which can be deployed over the release-server and start a release-server locally
 ```
 docker run \
--e RANCHER_URL=https://hosted.livingdocs.io \
+-e RANCHER_URL=<rancher-host> \
 -e CATTLE_ACCESS_KEY=<access-key> \
 -e CATTLE_SECRET_KEY=<secret-key> \
 -e ld_mapping__<service1>__rancher_service_id=<service-id> \
