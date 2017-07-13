@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "Marc Bachmann <marc.brookman@gmail.com>",
   "license": "ISC",
+  "scripts": {
+    "build": "docker build -t livingdocs/release-server ."
+  },
   "dependencies": {
     "@livingdocs/release-tools": "github:upfrontIO/release-tools",
     "cached-callback": "^2.1.1",

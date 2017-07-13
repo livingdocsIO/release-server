@@ -8,15 +8,26 @@ const uuid = require('uuid')
 
 const services = _.reduce(config.mapping, function (services, service, handle) {
   assert(handle, 'Service handle is required')
-  assert(service.rancher_service_id, 'service.rancher_service_id is required')
-  assert(service.docker_image, 'service.docker_image is required')
-  log.info(`Registered service ${handle}: ${JSON.stringify(service)}`)
-  services[handle] = Object.assign({}, service, {handle, trigger: createTrigger(service)})
+
+  const rancherServiceId = service.rancher_service_id
+  assert(rancherServiceId, 'service.rancher_service_id is required')
+
+  const dockerImage = service.docker_image
+  assert(dockerImage, 'service.docker_image is required')
+
+  service = {handle, dockerImage, rancherServiceId}
+  log.info(`Registered service: ${JSON.stringify(service)}`)
+  service.trigger = createTrigger(service)
+  services[handle] = service
   return services
 }, {})
 
 const flumelog = require('flumelog-offset')('./data', require('flumecodec').json)
 const ifErr = function (err) { err && log.error(err) }
+
+pull(flumelog.stream({live: true}), pull.drain(function (e) {
+  log.info(e)
+}))
 
 const notify = {
   DeploymentTriggered: function (id, {service, image, tag}) {
@@ -43,14 +54,14 @@ function createTrigger (service) {
 
     notify.DeploymentTriggered(id, {
       service: service.handle,
-      image: service.docker_image,
+      image: service.dockerImage,
       tag: tag
     })
 
-    execa('li-release', ['upgrade-rancher-container'], {
+    execa(require.resolve('.bin/li-release'), ['upgrade-rancher-container'], {
       env: Object.assign({}, process.env, {
-        RANCHER_SERVICE_ID: service.rancher_service_id || '',
-        DOCKER_IMAGE_TAG: `${service.docker_image}:${tag}`
+        RANCHER_SERVICE_ID: service.rancherServiceId || '',
+        DOCKER_IMAGE_TAG: `${service.dockerImage}:${tag}`
       })
     })
     .then(notify.DeploymentSucceeded.bind(null, id))
