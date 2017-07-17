@@ -27,7 +27,7 @@ To configure a deployment you always have to pass 2 environment variables during
 * `ld_mapping__<service1>__rancher_service_id=<service-id>`
 * `ld_mapping__<service1>__docker_image=<docker-image-name>`
 
-`<service1>` is a serviceHandle and is later used as an identifier to make a deployment. Every rancher environment has 1-n stacks, every stack has 1-n services and every service has 1-n containers. If you click on a service in the rancher gui, you will see the `service-id` of a service in the url f.e. `https://test.ch/env/<environment-id>/apps/stacks/<stack-id>/services/<service-id>/containers`. `docker-image-name` is the name of a docker image pushed to dockerhub.
+`<service1>` is a serviceHandle and is later used as an identifier to make a deployment. Every rancher environment has n stacks, every stack has n services and every service has n containers. If you click on a service in the rancher gui, you will see the `service-id` of a service in the url f.e. `https://test.ch/env/<environment-id>/apps/stacks/<stack-id>/services/<service-id>/containers`. `docker-image-name` is the name of a docker image pushed to dockerhub.
 
 
 
