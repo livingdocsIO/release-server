@@ -60,6 +60,9 @@ function createTrigger (service) {
 
     execa(require.resolve('.bin/li-release'), ['upgrade-rancher-container'], {
       env: Object.assign({}, process.env, {
+        RANCHER_URL: process.env.RANCHER_URL || process.env.CATTLE_URL,
+        CATTLE_ACCESS_KEY: process.env.CATTLE_ACCESS_KEY,
+        CATTLE_SECRET_KEY: process.env.CATTLE_SECRET_KEY,
         RANCHER_SERVICE_ID: service.rancherServiceId || '',
         DOCKER_IMAGE_TAG: `${service.dockerImage}:${tag}`
       })
