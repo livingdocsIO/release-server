@@ -110,5 +110,4 @@ fastify.route({
 const port = process.env.PORT || 8080
 fastify.listen(port, function (err) {
   if (err) throw err
-  log.info('Listening on http://localhost:%s', fastify.server.address().port)
 })

@@ -11,7 +11,7 @@
     "@livingdocs/release-tools": "github:upfrontIO/release-tools",
     "cached-callback": "^2.1.1",
     "execa": "^0.7.0",
-    "fastify": "^0.24.0",
+    "fastify": "^1.8.0",
     "flumecodec": "0.0.0",
     "flumelog-offset": "^3.0.3",
     "last-one-wins": "^1.0.4",
