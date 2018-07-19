@@ -8,7 +8,7 @@
     "build": "docker build -t livingdocs/release-server ."
   },
   "dependencies": {
-    "@livingdocs/release-tools": "github:upfrontIO/release-tools",
+    "@livingdocs/release-tools": "github:livingdocsIO/release-tools",
     "cached-callback": "^2.1.1",
     "execa": "^0.7.0",
     "fastify": "^1.8.0",
@@ -21,11 +21,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/upfrontIO/release-server.git"
+    "url": "git+https://github.com/livingdocsIO/release-server.git"
   },
   "bugs": {
-    "url": "https://github.com/upfrontIO/release-server/issues"
+    "url": "https://github.com/livingdocsIO/release-server/issues"
   },
-  "homepage": "https://github.com/upfrontIO/release-server#readme",
+  "homepage": "https://github.com/livingdocsIO/release-server#readme",
   "description": ""
 }
