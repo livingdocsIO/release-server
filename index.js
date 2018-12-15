@@ -1,10 +1,9 @@
 const _ = require('lodash')
-const log = require('pino')({ level: 'info' })
-const fastify = require('fastify')({ logger: log })
+const log = require('pino')({level: 'info', base: null})
+const fastify = require('fastify')({logger: log, level: 'error'})
 const config = require('rc')('ld')
 const assert = require('assert')
-const pull = require('pull-stream')
-const uuid = require('uuid')
+const nanoid = require('nanoid')
 
 const services = _.reduce(config.mapping, function (services, service, handle) {
   assert(handle, 'Service handle is required')
@@ -22,12 +21,13 @@ const services = _.reduce(config.mapping, function (services, service, handle) {
   return services
 }, {})
 
-const flumelog = require('flumelog-offset')('./data', require('flumecodec').json)
+const flumelog = require('flumelog-aligned-offset')('./data', {block: 64*1024, codec: require('flumecodec').json})
 const ifErr = function (err) { err && log.error(err) }
 
-pull(flumelog.stream({live: true}), pull.drain(function (e) {
-  log.info(e)
-}))
+flumelog.onReady((err) => {
+  if (err) throw err
+  log.info({filename: flumelog.filename, bytes: flumelog.length}, 'Flumelog opened')
+})
 
 const notify = {
   DeploymentTriggered: function (id, {service, image, tag}) {
@@ -49,7 +49,7 @@ function createTrigger (service) {
   const lastOne = require('last-one-wins')
 
   return lastOne(function trigger (tag, cb) {
-    const id = uuid.v4()
+    const id = nanoid(16)
     cb(null, {id})
 
     notify.DeploymentTriggered(id, {
@@ -78,12 +78,44 @@ fastify.route({
   url: '/events',
   handler: function (req, reply) {
     const options = flumelogOptionsParser(req.query)
-    pull(flumelog.stream(options), pull.collect(function (err, events) {
-      if (err) return reply.code(500).send(err)
-      reply.code(200).send(events)
-    }))
+
+    flumelog.stream(options)
+      .pipe(drainStream(function replyWithEvents (err, events) {
+        if (err) return reply.code(500).send(err)
+
+        reply
+          .code(200)
+          .header('Content-Type', 'application/json')
+          .serializer(serializeEvents)
+          .send(events)
+      }))
   }
 })
+
+function drainStream (cb) {
+  const items = []
+  return {
+    paused: false,
+    write (data) {
+      items.push(data)
+    },
+    end (err) {
+      cb(err, items)
+    }
+  }
+}
+
+function serializeEvents (events) {
+  let str = ''
+  for (const event of events) str = `${str},${serializeEvent(event)}`
+  return `[${str.substring(1)}]`
+}
+
+function serializeEvent (event) {
+  const {id, time, name, data} = event.value
+  const dataStr = typeof data === 'object' ? `,"data":${JSON.stringify(data)}` : ''
+  return `{"_seq":${event.seq},"id":"${id}","time":"${new Date(time).toISOString()}","name":"${name}"${dataStr}}`
+}
 
 fastify.route({
   method: 'POST',
@@ -110,4 +142,28 @@ fastify.route({
 const port = process.env.PORT || 8080
 fastify.listen(port, function (err) {
   if (err) throw err
+  flumelog.append({id: nanoid(16), time: Date.now(), name: 'Booted'}, ifErr)
+})
+
+process.on('SIGINT', () => {
+  flumelog.append({id: nanoid(16), time: Date.now(), name: 'Stopped'}, (err) => {
+    if (err) log.error(err)
+    flumelog.close(() => {
+      process.exit(0)
+    })
+  })
+})
+
+process.on('uncaughtException', (err) => {
+  log.error(err)
+  flumelog.append({id: nanoid(16), time: Date.now(), name: 'Crashed', data: {
+    message: err.message,
+    stack: err.stack,
+    code: err.code
+  }}, (err) => {
+    if (err) log.error(err)
+    flumelog.close(() => {
+      process.exit(1)
+    })
+  })
 })

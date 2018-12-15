@@ -9,15 +9,16 @@
   },
   "dependencies": {
     "@livingdocs/release-tools": "github:livingdocsIO/release-tools",
-    "cached-callback": "^2.1.1",
     "execa": "^0.7.0",
-    "fastify": "^1.8.0",
+    "fastify": "^1.13.2",
     "flumecodec": "0.0.0",
-    "flumelog-offset": "^3.0.3",
+    "flumedb": "^1.0.1",
+    "flumelog-aligned-offset": "^1.0.0",
     "last-one-wins": "^1.0.4",
-    "lodash": "^4.17.4",
-    "rc": "^1.2.1",
-    "uuid": "^3.1.0"
+    "lodash": "^4.17.11",
+    "ltgt": "^2.2.1",
+    "nanoid": "^2.0.0",
+    "rc": "^1.2.8"
   },
   "repository": {
     "type": "git",
