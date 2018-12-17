@@ -140,7 +140,7 @@ fastify.route({
 })
 
 const port = process.env.PORT || 8080
-fastify.listen(port, function (err) {
+fastify.listen(port, '0.0.0.0', function (err) {
   if (err) throw err
   flumelog.append({id: nanoid(16), time: Date.now(), name: 'Booted'}, ifErr)
 })
